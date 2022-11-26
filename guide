@@ -90,9 +90,9 @@ passwd $USER
 vim /etc/hostname
 	$HOSTNAME 
 vim /etc/hosts
-	127.0.0.1        localhost
+	127.0.0.1	localhost
 	::1             localhost
- 	127.0.1.1        myhostname.localdomain  myhostname
+ 	127.0.1.1       myhostname.localdomain  myhostname
 ln -s /etc/dinit.d/NetworkManager /etc/dinit.d/boot.d	
 
 # create efistub
