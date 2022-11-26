@@ -1,4 +1,4 @@
-###### ARTIX UEFI, SWAP, EFISTUB AND DINIT, WIRELESS NETWORK INSTALL GUIDE ######
+###### ARTIX UEFI, SWAP, EFISTUB, DINIT, WIRELESS NETWORK INSTALL GUIDE ######
 ## Pre-Basestrap
 
 Login as root
@@ -39,7 +39,7 @@ fatlabel /dev/sda1 BOOT
 # MOUNT ROOT BEFORE MOUNTING BOOT!
 swapon /dev/sda3 
 mount /dev/sda2 /mnt
-# mount boot to /mnt/boot, not /mnt/boot/efi (it's a better mount point for an efistub)
+# mount boot to /mnt/boot, not /mnt/boot/efi (it's a better mount point for efistub)
 mkdir /mnt/boot
 mount /dev/sda1 /mnt/boot
 
@@ -47,8 +47,9 @@ mount /dev/sda1 /mnt/boot
 dinitctl start ntpd
 
 # basestrapping
-basestrap /mnt base base-devel dinit elogind-dinit linux-zen linux-zen-headers linux-firmware networkmanager-dinit efibootmgr vim
+basestrap /mnt base base-devel dinit elogind-dinit linux-zen linux-zen-headers linux-firmware networkmanager-dinit efibootmgr intel-ucode vim
 # linux-zen-headers only necessary if on nvidia
+# intel-ucode if on intel, amd-ucode if on amd
 
 ## Post-Basestrap 
 # generate fstab
@@ -90,19 +91,20 @@ vim /etc/hostname
 	$HOSTNAME 
 vim /etc/hosts
 	127.0.0.1        localhost
-	 ::1             localhost
+	::1             localhost
  	127.0.1.1        myhostname.localdomain  myhostname
 ln -s /etc/dinit.d/NetworkManager /etc/dinit.d/boot.d	
 
 # create efistub
 # blkid to check UUIDs
-# --part 1 = boot partition number (/dev/sda1 = 1, /dev/sda2 = 2 ...)
+# resume = SWAP
+# --part 1 = boot partition number (if /mnt/boot is mounted on /dev/sda1 then --part 1, if mounted on /dev/sda2 --part 2 ...)
 # add kernel parameters after rw, separate with spaces ( mitigations=off nowatchdog quiet ...)
 # ucode for specific cpu (amd = amd-ucode.img)
 # -zen because of the zen kernel
 efibootmgr --disk /dev/sda --part 1 --create --label Artix --loader /vmlinuz-linux-zen --unicode 'root=UUID=(UUID) resume=UUID=(UUID) rw initrd=\intel-ucode.img initrd=\initramfs-linux-zen.img' --verbose
 
-# finish, manually poweroff
+# poweroff to finish, manually if necessary
 
 
 
