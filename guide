@@ -11,7 +11,7 @@ loadkeys br-abnt2
 # rfkill may block wifi
 rfkill unblock wifi
 
-# connect to wireless internet, if needed
+# connect to wireless internet
 connmanctl
 	agent on
 	# if scan wifi returns an error, reboot
