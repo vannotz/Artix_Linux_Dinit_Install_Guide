@@ -14,8 +14,8 @@ rfkill unblock wifi
 # connect to wireless internet
 connmanctl
 	agent on
-	# if scan wifi returns an error, reboot
 	scan wifi
+	# if it returns an error, reboot
 	# list devices
 	devices
 	# connect to your wifi device
@@ -23,8 +23,8 @@ connmanctl
 # ping to check connection
 ping -c3 gnu.org
 
-# partition disk with fdisk (UEFI)
 # check the install disk with lsblk
+# partition disk with fdisk (UEFI)
 fdisk /dev/sda 
 # make 3 partitions, 128M (Boot), xG (Swap), rest of the disk (Root)
 # x = ram*2
@@ -97,12 +97,12 @@ ln -s /etc/dinit.d/NetworkManager /etc/dinit.d/boot.d
 
 # create efistub
 # blkid to check UUIDs
+efibootmgr --disk /dev/sda --part 1 --create --label Artix --loader /vmlinuz-linux-zen --unicode 'root=UUID=(UUID) resume=UUID=(UUID) rw initrd=\intel-ucode.img initrd=\initramfs-linux-zen.img' --verbose
 # resume = SWAP
 # --part 1 = boot partition number (if /mnt/boot is mounted on /dev/sda1 then --part 1, if mounted on /dev/sda2 --part 2 ...)
 # add kernel parameters after rw, separate with spaces ( mitigations=off nowatchdog quiet ...)
 # ucode for specific cpu (amd = amd-ucode.img)
 # -zen because of the zen kernel
-efibootmgr --disk /dev/sda --part 1 --create --label Artix --loader /vmlinuz-linux-zen --unicode 'root=UUID=(UUID) resume=UUID=(UUID) rw initrd=\intel-ucode.img initrd=\initramfs-linux-zen.img' --verbose
 
 # poweroff to finish, manually if necessary
 
