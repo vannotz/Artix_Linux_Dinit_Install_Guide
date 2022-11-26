@@ -1,0 +1,110 @@
+###### ARTIX UEFI, SWAP, EFISTUB AND DINIT INSTALL GUIDE ######
+## Pre-Basestrap
+
+Login as root
+user:root
+passwd:artix
+
+# load your keymap 
+loadkeys br-abnt2
+
+# rfkill may block wifi
+rfkill unblock wifi
+
+# connect to wireless internet, if needed
+connmanctl
+	agent on
+	# if scan wifi returns an error, reboot
+	scan wifi
+	# list devices
+	devices
+	# connect to your wifi device
+	connect wifi_XXXXXXX
+# ping to check connection
+ping -c3 gnu.org
+
+# partition disk with fdisk (UEFI)
+# check the install disk with lsblk
+fdisk /dev/sda 
+# make 3 partitions, 128M (Boot), xG (Swap), rest of the disk (Root)
+# x = ram*2
+
+# format partitions (UEFI) 
+mkswap -L SWAP /dev/sda3 <- swap partition
+mkfs.ext4 -L ROOT /dev/sda2 <- root partition
+mkfs.fat -F32 /dev/sda1 <- boot partition
+fatlabel /dev/sda1 BOOT
+
+# mount partitions
+# MOUNT ROOT BEFORE MOUNTING BOOT!
+swapon /dev/sda3 
+mount /dev/sda2 /mnt
+# mount boot to /mnt/boot, not /mnt/boot/efi (it's a better mount point for an efistub)
+mkdir /mnt/boot
+mount /dev/sda1 /mnt/boot
+
+# update system clock
+dinitctl start ntpd
+
+# basestrapping
+basestrap /mnt base base-devel dinit elogind-dinit linux-zen linux-zen-headers linux-firmware networkmanager-dinit efibootmgr vim
+# linux-zen-headers only necessary if on nvidia
+
+## Post-Basestrap 
+# generate fstab
+fstabgen -U /mnt >> /mnt/etc/fstab
+
+# chroot into system
+artix-chroot /mnt
+
+# become bash
+bash
+
+# configure clock
+ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+hwclock --systohc
+
+# choose and set locale
+# uncomment desired locale, usually en_US.UTF-8 & en_US ISO
+vim /etc/locale.gen
+# generate locale 
+locale-gen
+# set locale systemwide
+vim /etc/locale.conf
+	LANG="en_US.UTF-8"
+	LC_COLLATE="C"
+
+# add user and add to wheel group
+useradd -mG wheel $USER
+
+# configure wheel group
+EDITOR=vim visudo
+# uncomment %wheel ALL=(ALL:ALL) ALL
+
+# configure passwords
+passwd
+passwd $USER
+
+# network config
+vim /etc/hostname
+	$HOSTNAME 
+vim /etc/hosts
+	127.0.0.1        localhost
+	 ::1             localhost
+ 	127.0.1.1        myhostname.localdomain  myhostname
+ln -s /etc/dinit.d/NetworkManager /etc/dinit.d/boot.d	
+
+# create efistub
+# blkid to check UUIDs
+# --part 1 = boot partition number (/dev/sda1 = 1, /dev/sda2 = 2 ...)
+# add kernel parameters after rw, separate with spaces ( mitigations=off nowatchdog quiet ...)
+# ucode for specific cpu (amd = amd-ucode.img)
+# -zen because of the zen kernel
+efibootmgr --disk /dev/sda --part 1 --create --label Artix --loader /vmlinuz-linux-zen --unicode 'root=UUID=(UUID) resume=UUID=(UUID) rw initrd=\intel-ucode.img initrd=\initramfs-linux-zen.img' --verbose
+
+# finish, manually poweroff
+
+
+
+
+		
