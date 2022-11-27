@@ -23,7 +23,7 @@ connmanctl
 # ping to check connection
 ping -c3 gnu.org
 
-# check the install disk with lsblk
+# check the install disk with lsblk, will be using /dev/sda
 # partition disk with fdisk (UEFI)
 fdisk /dev/sda 
 # make 3 partitions, 128M (Boot), xG (Swap), rest of the disk (Root)
@@ -87,12 +87,13 @@ passwd
 passwd $USER
 
 # network config
+# will be using 'artix' as the hostname, change to your liking
 vim /etc/hostname
-	$HOSTNAME 
+	artix
 vim /etc/hosts
 	127.0.0.1	localhost
 	::1             localhost
- 	127.0.1.1       myhostname.localdomain  myhostname
+ 	127.0.1.1       artix.localdomain  artix
 ln -s /etc/dinit.d/NetworkManager /etc/dinit.d/boot.d	
 
 # create efistub
@@ -100,8 +101,8 @@ ln -s /etc/dinit.d/NetworkManager /etc/dinit.d/boot.d
 efibootmgr --disk /dev/sda --part 1 --create --label Artix --loader /vmlinuz-linux-zen --unicode 'root=UUID=(UUID) resume=UUID=(UUID) rw initrd=\intel-ucode.img initrd=\initramfs-linux-zen.img' --verbose
 # resume = SWAP
 # --part 1 = boot partition number (if /mnt/boot is mounted on /dev/sda1 then --part 1, if mounted on /dev/sda2 --part 2 ...)
-# add kernel parameters after rw, separate with spaces ( mitigations=off nowatchdog quiet ...)
-# ucode for specific cpu (amd = amd-ucode.img)
+# add desired kernel parameters after rw, separate with spaces ( mitigations=off nowatchdog quiet ...)
+# initrd=\*-ucode for specific cpu (amd or intel)
 # -zen because of the zen kernel
 
 # poweroff to finish, manually if necessary
