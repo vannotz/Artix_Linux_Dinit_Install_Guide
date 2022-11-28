@@ -24,9 +24,9 @@ connmanctl
 ping -c3 gnu.org
 
 # check the install disk with lsblk, will be using /dev/sda
-# partition disk with fdisk (UEFI)
+# partition disk with fdisk
 fdisk /dev/sda 
-# make 3 partitions, 128M (Boot), xG (Swap), rest of the disk (Root)
+# make 3 partitions, nº1 128M (Boot), nº3 xG (Swap), nº2 rest of the disk (Root)
 # x = ram*2
 
 # format partitions (UEFI) 
