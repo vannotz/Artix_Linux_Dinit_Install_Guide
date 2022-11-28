@@ -103,7 +103,7 @@ efibootmgr --disk /dev/sda --part 1 --create --label Artix --loader /vmlinuz-lin
 # --part 1 = boot partition number (if /mnt/boot is mounted on /dev/sda1 then --part 1, if mounted on /dev/sda2 --part 2 ...)
 # add desired kernel parameters after rw, separate with spaces ( mitigations=off nowatchdog quiet ...)
 # my kernel parameters, for reference
-rw quiet loglevel=0 mitigations=off noatime sysctl.vm.swappiness=10 nowatchdog nomce zsawp.enabled=1 audit=0 ipv6.disable=1 module_blacklist=nouveau,pcspkr
+rw quiet loglevel=0 mitigations=off noatime sysctl.vm.swappiness=10 nowatchdog nomce zswap.enabled=1 audit=0 ipv6.disable=1 module_blacklist=nouveau,pcspkr
 # initrd=\*-ucode for specific cpu (amd or intel)
 # -zen because of the zen kernel
 
