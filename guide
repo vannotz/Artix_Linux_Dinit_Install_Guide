@@ -109,6 +109,21 @@ rw quiet loglevel=0 mitigations=off noatime sysctl.vm.swappiness=10 nowatchdog n
 
 # poweroff to finish, manually if necessary
 
+## Personal Post-Install Basic Needs
+# configure keyboard layout
+vim /etc/vconsole.conf
+	KEYMAP=br-abnt2
+vim /etc/X11/xorg.conf.f/00-keyboard.conf
+	Section "InputClass"
+		Identifier "keyboard layout"
+		MatchIsKeyboard "yes"
+		Option "XkbLayout" "br"
+		Option "XkbVariant" "abnt2"
+	EndSection
+
+# load legacy oss modules
+vim /etc/modules-load.d/modules.conf
+	snd_pcm_oss
 
 
 
